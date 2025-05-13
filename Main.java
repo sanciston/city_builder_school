@@ -11,6 +11,6 @@ import java.awt.*;
 
 public class Main {
     public static void main(String args[]) {
-        Window window = new Window("Hello", 1000, 1000);
+        Window window = new Window("Hello", 1600, 1000);
     }
 }

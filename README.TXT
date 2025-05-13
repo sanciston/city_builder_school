@@ -1,12 +1,10 @@
-------------------------------------------------------------------------
-This is the project README file. Here, you should describe your project.
-Tell the reader (someone who does not know anything about this project)
-all they need to know. The comments should usually include at least:
-------------------------------------------------------------------------
+          Brendan Laking's
+              Stupid
+             CITY GAME
+--------------------------------------
+This is a stupid city game for school.
+It's probably not fun and buggy. 
+DO NOT waste your time trying to play 
+this unless you are a teacher.
+--------------------------------------
 
-PROJECT TITLE:
-PURPOSE OF PROJECT:
-VERSION or DATE:
-HOW TO START THIS PROJECT:
-AUTHORS:
-USER INSTRUCTIONS:
