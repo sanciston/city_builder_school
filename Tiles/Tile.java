@@ -9,5 +9,24 @@ import java.awt.*;
 
 public class Tile {
     TileType type;
+    Direction direction;
     Color color;
+    
+    public Tile(TileType type, Direction direction) {
+        this.type = type;
+        this.direction = direction;
+        
+        switch(type) {
+            case ROAD:
+            case CURVED_ROAD:  
+                this.color = Color.GRAY;
+                break;
+            case GRASS:
+                this.color = Color.GREEN;
+                break;
+            default:
+                this.color = Color.WHITE;
+                break;
+        }
+    }
 }

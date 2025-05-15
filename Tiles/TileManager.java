@@ -8,7 +8,9 @@ public class TileManager {
     int height;
     
     Levels levels = new Levels();
-    public TileManager(int width, int height) {
+    public TileManager() {
         tiles = levels.defaultLevel;
+        this.width = tiles[0].length;
+        this.height = tiles.length;
     }
 }

@@ -9,5 +9,6 @@ package Tiles;
  */
 public enum TileType {
     ROAD,
+    CURVED_ROAD,
     GRASS
 }
