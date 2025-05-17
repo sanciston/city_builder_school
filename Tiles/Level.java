@@ -94,37 +94,62 @@ public class Level {
                 } else if(line == 1) { //Line 1 has the level name.
                     this.levelName = data;
                 } else if(line < this.height + 2) {
-                    //The tile data is formatted in alternated charecters representing tile type and tile dircetion. 
+                    //The tile data is formatted in alternated comma seperated values representing tile type and tile dircetion. This is a data storage format called DICSV (Dumb Idiot's CSV).
+        
+                    int charNumber = 0;
                     for(int i = 0; i < this.width; i++) {
-                        char typeChar = data.charAt(i * 2); //even numbers will be represent the type. 
-                        char directionChar = data.charAt((i * 2) + 1); //odd numbers will be represent the dircetion.
+                        String typeString = ""; 
+                        String directionString = "";
                         
                         Direction direction; 
-                        TileType tileType;
-
-                        //Give the tile its type.
-                        if(typeChar == 'R') {
-                            tileType = TileType.ROAD;
-                        } else if(typeChar == 'G') {
-                            tileType = TileType.GRASS;
-                        } else if(typeChar == 'C') {
-                            tileType = TileType.CURVED_ROAD;
-                        } else {
-                            tileType = TileType.UNKNOWN;
-                        } 
+                        TileType type;
                         
-                        //Give the tile its direction.
-                        if(directionChar == 'N') {
-                            direction = Direction.NORTH;
-                        } else if(directionChar == 'E') {
-                            direction = Direction.EAST;
-                        } else if(directionChar == 'S') {
-                            direction = Direction.SOUTH;
-                        } else {
-                            direction = Direction.WEST; //an unkown direction seems pointless so it'll default west for funnies
+                        //Get type data until we reach a comma.
+                        while(data.charAt(charNumber) != ',') {
+                            typeString += String.valueOf(data.charAt(charNumber));
+                            charNumber++;
+                        }                        
+
+
+                        charNumber++; //Skip the comma.
+                        
+                        //Get direction data until we reach a comma.
+                        while(data.charAt(charNumber) != ',') {
+                            directionString += String.valueOf(data.charAt(charNumber));
+                            charNumber++;
                         }
                         
-                        tiles[i][line - 2] = new Tile(tileType, direction);
+                        charNumber++; //Skip the comma.
+                        
+
+
+                        //Set the type to corresponding enumerated value.
+                        System.out.println(typeString);
+                        System.out.println(typeString.equals("GRASS"));
+
+
+                        if(typeString.equals("GRASS")) { 
+                            type = TileType.GRASS;
+                        } else if (typeString.equals("ROAD")) {
+                            type = TileType.ROAD;
+                        } else if (typeString.equals("CURVED_ROAD")) {
+                            type = TileType.CURVED_ROAD;
+                        } else {
+                            type = TileType.UNKNOWN;
+                        }
+                        
+                        //Set the direction to corresponding enumerated value.
+                        if(directionString.equals("NORTH")) { 
+                            direction = Direction.NORTH;
+                        } else if (directionString.equals("EAST")) {
+                            direction = Direction.EAST;
+                        } else if (directionString.equals("SOUTH")) {
+                            direction = Direction.SOUTH;
+                        } else {
+                            direction = Direction.WEST; //Why not set direction to west if it's unknown?
+                        }
+                        
+                        tiles[i][line - 2] = new Tile(type, direction);
                     }
                 }
                 line++;
