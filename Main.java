@@ -1,9 +1,9 @@
 
 /**
- * Write a description of class Main here.
+ * The main class does the basic management and game loop
  *
- * @author (your name)
- * @version (a version number or a date)
+ * AUTHOR: Brendan Laking
+ * VERSION:
  */
 
 import javax.swing.*;
