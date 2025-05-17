@@ -43,6 +43,7 @@ public class Panel extends JPanel implements Runnable {
            
             if(delta >= 1) {
                 repaint();
+                update();
                 delta--;
                 drawCount++;
             }
@@ -59,8 +60,12 @@ public class Panel extends JPanel implements Runnable {
         super.paintComponent(g);
         
         Graphics2D g2 = (Graphics2D)g;
-                     
+        
         g2.dispose();
+    }
+    
+    public void update() {
+    
     }
 }
 

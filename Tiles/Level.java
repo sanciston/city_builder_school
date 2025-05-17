@@ -21,14 +21,6 @@ public class Level {
     
     public Level(String fileName) {   
         loadFromFile(fileName);
-        
-        for(int y = 0; y < this.height; y++) {
-            for(int x = 0; x < this.width; x++) {
-                System.out.print(tiles[x][y].type);
-                System.out.print(" ");
-            }
-            System.out.print("\n");
-        }
     }
     
     //Function loadFromFile loads the file into the level class. Returns false if it can't load, returns true if it can load
@@ -121,13 +113,7 @@ public class Level {
                         
                         charNumber++; //Skip the comma.
                         
-
-
                         //Set the type to corresponding enumerated value.
-                        System.out.println(typeString);
-                        System.out.println(typeString.equals("GRASS"));
-
-
                         if(typeString.equals("GRASS")) { 
                             type = TileType.GRASS;
                         } else if (typeString.equals("ROAD")) {

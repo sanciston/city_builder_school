@@ -8,4 +8,6 @@ comment3.params=
 comment3.target=void\ run()
 comment4.params=g
 comment4.target=void\ paintComponent(java.awt.Graphics)
-numComments=5
+comment5.params=
+comment5.target=void\ update()
+numComments=6
