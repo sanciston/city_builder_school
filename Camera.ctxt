@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Camera
+comment0.text=\n\ Basic\ camera\ type\n\n\ AUTHOR\:\ Brendan\ Laking\n\ VERSION\:\ 2025.05.18\n
+comment1.params=zoom\ x\ y
+comment1.target=Camera(int,\ int,\ int)
+numComments=2

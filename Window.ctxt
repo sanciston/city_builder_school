@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=Window
+comment1.params=title\ width\ height
+comment1.target=Window(java.lang.String,\ int,\ int)
+numComments=2
