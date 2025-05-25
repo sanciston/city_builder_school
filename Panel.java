@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 import Tiles.*;
 
 
-public class Panel extends JPanel implements Runnable, KeyListener, MouseListener {
+public class Panel extends JPanel implements Runnable, KeyListener, MouseListener, MouseWheelListener {
     
     Thread thread; //New CPU thread to run on.
     
@@ -64,6 +64,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         
         addKeyListener(this); //Listen for key inputs.
         addMouseListener(this);
+        addMouseWheelListener(this);
+
         
         screenWidth = width;
         screenHeight = height;
@@ -296,7 +298,14 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 break;
         }
     }
-
+    
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if(e.getWheelRotation() == 1 && game.camera.zoom < game.camera.maxZoom) {
+             game.camera.zoom *= 1.01;
+        } else if(game.camera.zoom > game.camera.minZoom) {
+            game.camera.zoom *= 0.99;
+        }
+    }
     
     public void keyTyped(KeyEvent e) {} public void mousePressed(MouseEvent e) {} public void mouseReleased(MouseEvent e) {} public void mouseEntered(MouseEvent e) {}  public void mouseExited(MouseEvent e) {}//I have no use for this but I have to define it.
     

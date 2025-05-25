@@ -28,19 +28,19 @@ public class Game  {
     
     public void update() {
         if(keys.W) {
-            camera.y -= speed;
+            camera.y -= speed / camera.zoom + 1;
         }
         
         if(keys.S) {
-            camera.y += speed;
+            camera.y += speed / camera.zoom + 1;
         }
         
         if(keys.A) {
-            camera.x -= speed;
+            camera.x -= speed / camera.zoom + 1;
         }
         
         if(keys.D) {
-            camera.x += speed;
+            camera.x += speed / camera.zoom + 1;
         }
         
         if (keys.UP && camera.zoom < camera.maxZoom) {
