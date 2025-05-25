@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Button
+comment0.text=\n\ Button\ class\ for\ menus\n\ \n\ AUTHOR\:\ Brendan\ Laking\n\ VERSION\:\ 2025.05.25\n
+comment1.params=mouseX\ mouseY
+comment1.target=boolean\ isHovered(int,\ int)
+numComments=2

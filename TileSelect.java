@@ -29,17 +29,9 @@ public class TileSelect {
     
     public int tileSize = 100;
     
-    public BufferedImage tileSelectIcon = null;
 
 
     public TileSelect() {
-        try {
-            tileSelectIcon = ImageIO.read(new File("Assets/tileselecticon.png"));
-        }
-        catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
-        }
-        
         double height = TileType.values().length / openTileWidth;
         openHeight = (int) Math.ceil(height);
     }

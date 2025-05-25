@@ -39,11 +39,17 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     
     TileSelect tileSelect = new TileSelect();
     
+    ImageButton exitImageButton;
+    
     public BufferedImage exitIcon = null;
     
     public State state = State.GAME;
     
     final Color highlightColor = new Color(0, 0, 0, 50);
+    
+    PauseMenu pauseMenu;
+    
+    public String savesFolder = "Saves/";
         
     public Panel(int width, int height) {
         setPreferredSize(new Dimension(width, height));
@@ -61,7 +67,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         screenHeight = height;
         
         try {
-            exitIcon = ImageIO.read(new File("Assets/exit.png"));
+            exitImageButton = new ImageButton(0, 0, tileSelect.tileSize, tileSelect.tileSize, ImageIO.read(new File("Assets/exit.png")));
+            pauseMenu = new PauseMenu(width, height);
         }
         catch (java.io.IOException ioe) {
             ioe.printStackTrace();
@@ -130,8 +137,9 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                     }
                     x++;
                 }
+                exitImageButton.draw(g2);
                             
-                if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
+                if(mouseDown && exitImageButton.isHovered((int) mouseY, (int) mouseX)) {
                     state = State.GAME;
                 } 
                 break;
@@ -158,7 +166,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                 try {
                                     game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
                                 } catch (java.io.IOException ioe) {
-                                ioe.printStackTrace();
+                                    ioe.printStackTrace();
                                 }
                             }
                         }
@@ -175,8 +183,38 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 }
     
                 if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
-                state = State.TILE_SELECT;
+                    state = State.TILE_SELECT;
                 } 
+                break;
+            }
+            
+            case PAUSE_MENU: {
+                switch(pauseMenu.state) {
+                    case MAIN:
+                        if(mouseDown) {
+                            if(pauseMenu.loadGame.isHovered((int) mouseX, (int) mouseY)) {
+                                pauseMenu.state = PauseMenuState.LOAD_GAME;
+                            }
+                        }
+                        pauseMenu.saveGame.draw(g2);
+                        pauseMenu.loadGame.draw(g2);
+                        break;
+                    
+                    case LOAD_GAME: 
+                        for(int i = 0; i < pauseMenu.saves.size(); i++) {
+                            pauseMenu.saves.get(i).draw(g2);
+                            
+                            if(mouseDown) {
+                                if(pauseMenu.saves.get(i).isHovered((int) mouseX, (int) mouseY)) {
+                                    game.level.loadFromFile(savesFolder + pauseMenu.saves.get(i).text);
+                                    pauseMenu.state = PauseMenuState.MAIN;
+                                }
+                            }
+                        break;
+                    }
+                }
+                
+                break;
             }
         }
         
@@ -221,6 +259,15 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 break;
             case KeyEvent.VK_RIGHT:
                 tileSelect.selectedDirection = Direction.EAST;
+                break;
+            case KeyEvent.VK_ESCAPE:
+                pauseMenu.state = PauseMenuState.MAIN;
+                if(state == State.PAUSE_MENU) {
+                    state = State.GAME;
+                } else {
+                    pauseMenu.getSaves(savesFolder);
+                    state = State.PAUSE_MENU;
+                }
                 break;
         }
     }

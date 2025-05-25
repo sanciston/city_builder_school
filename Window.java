@@ -3,7 +3,7 @@
  * Basic JFrame functionality 
  * 
  * AUTHOR: Brendan Laking
- * VERSION: 2025.05.18
+ * VERSION: 2025.05.25
  */
 
 import javax.swing.*;
@@ -13,7 +13,6 @@ import java.awt.event.*;
 public class Window extends JFrame {
     public Window(String title, int width, int height) {
         setTitle(title);
-        getContentPane().setPreferredSize(new Dimension(width, height));
         setDefaultCloseOperation(EXIT_ON_CLOSE); //Makes it so that when the close button is presed on the window it closes.
 
         setResizable(false); 
@@ -28,7 +27,6 @@ public class Window extends JFrame {
         
         toFront(); 
         
-        panel.startThread(); //Start the thread for the panel to draw.
-        
+        panel.startThread(); //Start the thread for the panel to draw.   
     }
 }

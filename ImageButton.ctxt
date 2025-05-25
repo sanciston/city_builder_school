@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=ImageButton
+comment1.params=x\ y\ width\ height\ image
+comment1.target=ImageButton(int,\ int,\ int,\ int,\ java.awt.image.BufferedImage)
+comment2.params=g2
+comment2.target=void\ draw(java.awt.Graphics2D)
+numComments=3
