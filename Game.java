@@ -3,7 +3,7 @@
  * Game managment and updating functions
  * 
  * AUTHOR: Brendan Laking
- * VERSION: 2025.05.21
+ * VERSION: 2025.05.25
  */
 
 import Tiles.*;
@@ -53,15 +53,6 @@ public class Game  {
     }
     
     public class Keys {
-        boolean W, A, S, D, UP, DOWN;
-        
-        public Keys() {
-            this.W = false;
-            this.A = false;
-            this.S = false;
-            this.D = false;
-            this.UP = false;
-            this.DOWN = false;
-        }
+        boolean W, A, S, D, UP, DOWN = false;
     }
 }

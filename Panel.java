@@ -3,7 +3,7 @@
  * Panel for rendering
  * 
  * AUTHOR: Brendan Laking
- * VERSION: 2025.05.24
+ * VERSION: 2025.05.25
  */
 
 
@@ -40,6 +40,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     TileSelect tileSelect = new TileSelect();
     
     public BufferedImage exitIcon = null;
+    
+    public State state = State.GAME;
     
     final Color highlightColor = new Color(0, 0, 0, 50);
         
@@ -106,70 +108,76 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         mouseTileX = (((mouseX + (game.camera.x * game.camera.zoom) - (screenWidth  / 2)) / game.camera.zoom / Tile.tileSize));         
         mouseTileY = (((mouseY + (game.camera.y * game.camera.zoom) - (screenHeight / 2)) / game.camera.zoom / Tile.tileSize));
         
-        if(tileSelect.visible) {
-            g2.drawImage(exitIcon, tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
-            
-            int x = 0;
-            for(TileType type : TileType.values()) {
-                try {
-                    g2.drawImage(game.level.tiles[0][0].getImageFromType(type), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null);
-                }
-                catch (java.io.IOException ioe) {
-                    ioe.printStackTrace();
-                }
-
-                if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {
-                    g2.setColor(highlightColor);
-                    g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
-                    
-                    if(mouseDown) {
-                        tileSelect.selectedTile = type;
+        switch(state) {
+            case TILE_SELECT: {
+                int x = 0;
+                for(TileType type : TileType.values()) {
+                    try {
+                        g2.drawImage(game.level.tiles[0][0].getImageFromType(type), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null);
                     }
-                }
-                x++;
-            }
-            
-            if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
-                tileSelect.visible = false;
-            } 
-        } else {
-            for(int y = 0; y < game.level.height; y++) {
-                for(int x = 0; x < game.level.width; x++) {
-                    AffineTransform tx = new AffineTransform();
-                    tx.rotate(game.level.tiles[x][y].rotation, (Tile.tileSize / 2), (Tile.tileSize / 2));
-                    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-                    g2.drawImage(op.filter(game.level.tiles[x][y].image, null),
-                                (int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
-                                (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
-                                (int) (Tile.tileSize     * game.camera.zoom), 
-                                (int) (Tile.tileSize     * game.camera.zoom), null);
-                            
-                    if(Math.floor(mouseTileX) == x && Math.floor(mouseTileY) == y) {
+                    catch (java.io.IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+
+                    if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {
                         g2.setColor(highlightColor);
-                        g2.fillRect((int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
-                                    (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
-                                    (int) (Tile.tileSize     * game.camera.zoom), 
-                                    (int) (Tile.tileSize     * game.camera.zoom));
+                        g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
+                    
                         if(mouseDown) {
-                            try {
-                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, Direction.NORTH);
-                            } catch (java.io.IOException ioe) {
+                            tileSelect.selectedTile = type;
+                            state = State.GAME;
+                        }
+                    }
+                    x++;
+                }
+                            
+                if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
+                    state = State.GAME;
+                } 
+                break;
+            }
+            case GAME: {
+                for(int y = 0; y < game.level.height; y++) {
+                    for(int x = 0; x < game.level.width; x++) {
+                        AffineTransform tx = new AffineTransform();
+                        tx.rotate(game.level.tiles[x][y].rotation, (Tile.tileSize / 2), (Tile.tileSize / 2));
+                        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+                        g2.drawImage(op.filter(game.level.tiles[x][y].image, null),
+                                    (int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                                    (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
+                                    (int) (Tile.tileSize     * game.camera.zoom) + 1, 
+                                    (int) (Tile.tileSize     * game.camera.zoom) + 1, null);
+                            
+                        if(Math.floor(mouseTileX) == x && Math.floor(mouseTileY) == y) {
+                            g2.setColor(highlightColor);
+                            g2.fillRect((int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                                        (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
+                                        (int) (Tile.tileSize     * game.camera.zoom) + 1, 
+                                        (int) (Tile.tileSize     * game.camera.zoom) + 1);
+                            if(mouseDown) {
+                                try {
+                                    game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                } catch (java.io.IOException ioe) {
                                 ioe.printStackTrace();
+                                }
                             }
                         }
                     }
-                }
-            }   
+                }   
             
-            try {
-                g2.drawImage(game.level.tiles[0][0].getImageFromType(tileSelect.selectedTile), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
-            } catch (java.io.IOException ioe) {
-                ioe.printStackTrace();
-            }
+                try {
+                    AffineTransform tx = new AffineTransform();
+                    tx.rotate(game.level.tiles[0][0].getRotationFromDirection(tileSelect.selectedDirection), (Tile.tileSize / 2), (Tile.tileSize / 2));
+                    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+                    g2.drawImage(op.filter(game.level.tiles[0][0].getImageFromType(tileSelect.selectedTile), null), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
+                } catch (java.io.IOException ioe) {
+                    ioe.printStackTrace();
+                }
     
-            if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
-                tileSelect.visible = true;
-            } 
+                if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
+                state = State.TILE_SELECT;
+                } 
+            }
         }
         
         if(mouseDown) {
@@ -196,11 +204,23 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             case KeyEvent.VK_D:
                 game.keys.D = true;
                 break;
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_Q:
                 game.keys.UP = true;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_E:
                 game.keys.DOWN = true;
+                break;
+            case KeyEvent.VK_UP:
+                tileSelect.selectedDirection = Direction.NORTH;
+                break;
+            case KeyEvent.VK_DOWN:
+                tileSelect.selectedDirection = Direction.SOUTH;
+                break;
+            case KeyEvent.VK_LEFT:
+                tileSelect.selectedDirection = Direction.WEST;
+                break;
+            case KeyEvent.VK_RIGHT:
+                tileSelect.selectedDirection = Direction.EAST;
                 break;
         }
     }
@@ -220,10 +240,10 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             case KeyEvent.VK_D:
                 game.keys.D = false;
                 break;
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_Q:
                 game.keys.UP = false;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_E:
                 game.keys.DOWN = false;
                 break;
         }

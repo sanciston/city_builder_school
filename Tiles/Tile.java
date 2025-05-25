@@ -29,21 +29,7 @@ public class Tile {
         
 
         this.image = getImageFromType(type);
-
-        switch(direction) {
-            case NORTH:
-                this.rotation = -((float) Math.PI / 2);
-                break;
-            case SOUTH:
-                this.rotation = ((float) Math.PI / 2);
-                break;
-            case WEST:
-                this.rotation = 0;
-                break;
-            case EAST:
-                this.rotation = ((float) Math.PI);
-                break;
-        }
+        this.rotation = getRotationFromDirection(direction);
     }
     
     public BufferedImage getImageFromType(TileType type) throws java.io.IOException {
@@ -56,6 +42,21 @@ public class Tile {
                 return ImageIO.read(new File("Assets/grass.png"));
             default:
                 return ImageIO.read(new File("Assets/grass.png"));
+        }
+    }
+    
+    public float getRotationFromDirection(Direction direction) {
+        switch(direction) {
+            case NORTH:
+                return 0;
+            case SOUTH:
+                return ((float) Math.PI);
+            case WEST:
+                return -((float) Math.PI / 2);
+            case EAST:
+                return ((float) Math.PI / 2);
+            default:
+                return 0;
         }
     }
 }

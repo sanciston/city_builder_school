@@ -5,7 +5,6 @@
  * @author (your name here)
  * @version (version number or date here)
  */
-public enum State
-{
-    GAME, SAVE, TILESELECT, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+public enum State {
+    GAME, SAVE, TILE_SELECT,
 }

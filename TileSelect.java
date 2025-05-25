@@ -13,7 +13,6 @@ import java.io.File;
 
 
 public class TileSelect {
-    public boolean visible = false;
     public TileType selectedTile = TileType.GRASS; 
     public Direction selectedDirection = Direction.NORTH;
     
