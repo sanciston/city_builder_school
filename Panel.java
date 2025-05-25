@@ -50,6 +50,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     PauseMenu pauseMenu;
     
     public String savesFolder = "Saves/";
+    
+    Images images;
         
     public Panel(int width, int height) {
         setPreferredSize(new Dimension(width, height));
@@ -69,10 +71,13 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         try {
             exitImageButton = new ImageButton(0, 0, tileSelect.tileSize, tileSelect.tileSize, ImageIO.read(new File("Assets/exit.png")));
             pauseMenu = new PauseMenu(width, height);
+            images = new Images();
         }
         catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
+        
+        
     }
     
     public void startThread() {
@@ -120,7 +125,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 int x = 0;
                 for(TileType type : TileType.values()) {
                     try {
-                        g2.drawImage(game.level.tiles[0][0].getImageFromType(type), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null);
+                        g2.drawImage(images.getImageFromType(type, Direction.NORTH), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null);
                     }
                     catch (java.io.IOException ioe) {
                         ioe.printStackTrace();
@@ -145,39 +150,32 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 break;
             }
             case GAME: {
-                for(int y = 0; y < game.level.height; y++) {
-                    for(int x = 0; x < game.level.width; x++) {
-                        AffineTransform tx = new AffineTransform();
-                        tx.rotate(game.level.tiles[x][y].rotation, (Tile.tileSize / 2), (Tile.tileSize / 2));
-                        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-                        g2.drawImage(op.filter(game.level.tiles[x][y].image, null),
-                                    (int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
-                                    (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
-                                    (int) (Tile.tileSize     * game.camera.zoom) + 1, 
-                                    (int) (Tile.tileSize     * game.camera.zoom) + 1, null);
-                            
-                        if(Math.floor(mouseTileX) == x && Math.floor(mouseTileY) == y) {
-                            g2.setColor(highlightColor);
-                            g2.fillRect((int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                try {
+                    for(int y = 0; y < game.level.height; y++) {
+                        for(int x = 0; x < game.level.width; x++) {
+                            g2.drawImage(images.getImageFromType(game.level.tiles[x][y].type, game.level.tiles[x][y].direction),
+                                        (int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
                                         (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
                                         (int) (Tile.tileSize     * game.camera.zoom) + 1, 
-                                        (int) (Tile.tileSize     * game.camera.zoom) + 1);
-                            if(mouseDown) {
+                                        (int) (Tile.tileSize     * game.camera.zoom) + 1, null);
+                            
+                            if(Math.floor(mouseTileX) == x && Math.floor(mouseTileY) == y) {
+                                g2.setColor(highlightColor);
+                                g2.fillRect((int) (x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                                            (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
+                                            (int) (Tile.tileSize     * game.camera.zoom) + 1, 
+                                            (int) (Tile.tileSize     * game.camera.zoom) + 1);
+                                if(mouseDown) {
                                 try {
-                                    game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
-                                } catch (java.io.IOException ioe) {
-                                    ioe.printStackTrace();
+                                        game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                    } catch (java.io.IOException ioe) {
+                                        ioe.printStackTrace();
+                                        }
                                 }
                             }
                         }
-                    }
-                }   
-            
-                try {
-                    AffineTransform tx = new AffineTransform();
-                    tx.rotate(game.level.tiles[0][0].getRotationFromDirection(tileSelect.selectedDirection), (Tile.tileSize / 2), (Tile.tileSize / 2));
-                    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-                    g2.drawImage(op.filter(game.level.tiles[0][0].getImageFromType(tileSelect.selectedTile), null), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
+                    }   
+                    g2.drawImage(images.getImageFromType(tileSelect.selectedTile, tileSelect.selectedDirection), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
                 } catch (java.io.IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -194,6 +192,9 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                         if(mouseDown) {
                             if(pauseMenu.loadGame.isHovered((int) mouseX, (int) mouseY)) {
                                 pauseMenu.state = PauseMenuState.LOAD_GAME;
+                            } else if(pauseMenu.saveGame.isHovered((int) mouseX, (int) mouseY)) {
+                                state = State.GAME;
+                                game.level.saveToFile(game.level.loadedFile);
                             }
                         }
                         pauseMenu.saveGame.draw(g2);
@@ -207,12 +208,12 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                             if(mouseDown) {
                                 if(pauseMenu.saves.get(i).isHovered((int) mouseX, (int) mouseY)) {
                                     game.level.loadFromFile(savesFolder + pauseMenu.saves.get(i).text);
-                                    pauseMenu.state = PauseMenuState.MAIN;
+                                    state = State.GAME;
                                 }
                             }
+                        }
                         break;
                     }
-                }
                 
                 break;
             }

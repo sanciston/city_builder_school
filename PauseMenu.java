@@ -29,7 +29,7 @@ public class PauseMenu {
         if(listOfFiles != null) {
             for (int i = 0; i < listOfFiles.length; i++) {
                 if (listOfFiles[i].isFile()) {
-                    saves.add(new TextButton(0, i * 150, 500, 100, 100, listOfFiles[i].getName(), new Color(255, 255, 255), new Color(0, 0, 0)));
+                    saves.add(new TextButton(0, i * 150, 1600, 100, 100, listOfFiles[i].getName(), new Color(255, 255, 255), new Color(0, 0, 0)));
                     System.out.println(listOfFiles[i].getName());
                 } 
              }

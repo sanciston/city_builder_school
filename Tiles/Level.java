@@ -18,12 +18,17 @@ public class Level {
     
     String levelName;
     
-    public Level(String fileName) {   
+    public String loadedFile = "";
+    
+    public Level(String fileName) { 
+        loadedFile = fileName;
         loadFromFile(fileName);
     }
     
     //Function loadFromFile loads the file into the level class. Returns false if it can't load, returns true if it can load
     public boolean loadFromFile(String fileName) {
+        loadedFile = fileName;
+
         String data = null;
         
         File file = new File(fileName);  
