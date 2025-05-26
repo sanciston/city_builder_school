@@ -36,6 +36,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     double mouseTileX;
     double mouseTileY;
     boolean mouseDown;
+    boolean mouseClicked;
     
     TileSelect tileSelect = new TileSelect();
     
@@ -146,7 +147,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 }
                 exitImageButton.draw(g2);
                             
-                if(mouseDown && exitImageButton.isHovered((int) mouseY, (int) mouseX)) {
+                if(mouseClicked && exitImageButton.isHovered((int) mouseY, (int) mouseX)) {
                     state = State.GAME;
                 } 
                 break;
@@ -182,7 +183,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                     ioe.printStackTrace();
                 }
     
-                if(mouseDown && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
+                if(mouseClicked && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
                     state = State.TILE_SELECT;
                 } 
                 break;
@@ -221,8 +222,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             }
         }
         
-        if(mouseDown) {
-            mouseDown = false;
+        if (mouseClicked) {
+            mouseClicked = false;
         }
         
         g2.dispose();
@@ -301,18 +302,26 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     
     public void mouseWheelMoved(MouseWheelEvent e) {
         if(e.getWheelRotation() == 1 && game.camera.zoom < game.camera.maxZoom) {
-             game.camera.zoom *= 1.01;
+            game.camera.zoom *= 0.9;
         } else if(game.camera.zoom > game.camera.minZoom) {
-            game.camera.zoom *= 0.99;
+            game.camera.zoom *= 1.1;
         }
     }
     
-    public void keyTyped(KeyEvent e) {} public void mousePressed(MouseEvent e) {} public void mouseReleased(MouseEvent e) {} public void mouseEntered(MouseEvent e) {}  public void mouseExited(MouseEvent e) {}//I have no use for this but I have to define it.
-    
+    public void keyTyped(KeyEvent e) {} public void mouseEntered(MouseEvent e) {}  public void mouseExited(MouseEvent e) {}//I have no use for this but I have to define it.
     
     public void mouseClicked(MouseEvent e) {
+        mouseClicked = true;
+    } 
+    
+    public void mousePressed(MouseEvent e) {
         mouseDown = true;
     }
+    
+    public void mouseReleased(MouseEvent e) {
+        mouseDown = false;
+    }
+        
     
     public Point getRelativePoint() {
         PointerInfo pointer = MouseInfo.getPointerInfo();
