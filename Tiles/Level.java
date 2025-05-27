@@ -145,12 +145,13 @@ public class Level {
                     }
                 } else {
                     String string = "";
-                    int i = 0;
+                    int charNumber = 0;
                     int storeys, x, y;
                     
-                    //Get the width data up until the , seperator.
-                    for(i = 0; data.charAt(i) != ','; i++) {
-                        string = string + data.charAt(i);
+                    //Get the storeys data up until the , seperator.
+                    while(data.charAt(charNumber) != ','){
+                        string = string + data.charAt(charNumber);
+                        charNumber++;
                     }
                     
                     //Convert that data into intergers 
@@ -163,11 +164,12 @@ public class Level {
 
 
                     string = ""; //Reset the string.
-                    i++; //Skip past the , seperator.
+                    charNumber++; //Skip past the , seperator.
                     
-                    //Get the width data up until the , seperator.
-                    for(i = 0; data.charAt(i) != ','; i++) {
-                        string = string + data.charAt(i);
+                    //Get the x data up until the , seperator.
+                    while(data.charAt(charNumber) != ',') {
+                        string = string + data.charAt(charNumber);
+                        charNumber++;
                     }  
                     
                     try {
@@ -178,11 +180,12 @@ public class Level {
                     }
                     
                     string = ""; //Reset the string.
-                    i++; //Skip past the , seperator.
+                    charNumber++; //Skip past the , seperator.
                     
-                    //Get the width data up until the , seperator.
-                    for(i = 0; data.charAt(i) != ','; i++) {
-                        string = string + data.charAt(i);
+                    //Get the y data up until the , seperator.
+                    while(data.charAt(charNumber) != ',') {
+                        string = string + data.charAt(charNumber);
+                        charNumber++;
                     }
                     
                     try {
@@ -193,11 +196,12 @@ public class Level {
                     }
                     
                     string = ""; //Reset the string.
-                    i++; //Skip past the , seperator.
+                    charNumber++; //Skip past the , seperator.
                     
-                    //Get the width data up until the , seperator.
-                    for(i = 0; data.charAt(i) != ','; i++) {
-                        string = string + data.charAt(i);
+                    //Get the type data up until the , seperator.
+                    while(data.charAt(charNumber) != ',') {
+                        string = string + data.charAt(charNumber);
+                        charNumber++;
                     }
                     
                     if(string == "RESIDENTIAL") {
@@ -271,7 +275,7 @@ public class Level {
             for(int i = 0; i < houses.size(); i++) {
                 data += Integer.toString(houses.get(i).storeys) + ",";
                 data += Integer.toString(houses.get(i).x) + ",";
-                data += Integer.toString(houses.get(i).x) + ",";
+                data += Integer.toString(houses.get(i).y) + ",";
                 
                 switch(houses.get(i).type) {
                     case RESIDENTIAL:
@@ -281,7 +285,7 @@ public class Level {
                         data += "COMMERCIAL,";
                         break;
                     case BUSINESS:
-                        data += "BUSINESS";
+                        data += "BUSINESS,";
                         break;
                 }
                 data += "\n";
