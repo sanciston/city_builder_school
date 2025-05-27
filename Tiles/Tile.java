@@ -1,6 +1,6 @@
 package Tiles;
 /**
- * Class of tile
+ * Class for tiles
  *
  * AUTHOR: Brendan Laking
  * VERSION: 2025.05.24

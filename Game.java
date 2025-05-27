@@ -43,13 +43,18 @@ public class Game  {
             camera.x += speed / camera.zoom + 1;
         }
         
-        if (keys.UP && camera.zoom < camera.maxZoom) {
-            camera.zoom *= 1.01;
-        }
         
-        if (keys.DOWN && camera.zoom > camera.minZoom) {
+        if(keys.DOWN) {
+            if(camera.zoom < camera.minZoom) {
+                camera.zoom = camera.minZoom;  
+            }
             camera.zoom *= 0.99;
-        }    
+        } else if(keys.UP){
+            if(camera.zoom > camera.maxZoom) {
+                camera.zoom = camera.maxZoom;  
+            }
+                camera.zoom *= 1.01;
+        } 
     }
     
     public class Keys {

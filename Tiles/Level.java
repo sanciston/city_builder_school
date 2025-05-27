@@ -7,11 +7,13 @@ package Tiles;
  */
 import java.io.*;
 import java.util.Scanner; 
+import java.util.ArrayList;
 
 
 public class Level {
     
     public Tile[][] tiles;
+    public ArrayList<House> houses = new ArrayList<House>();
     
     public int width;
     public int height;
@@ -22,7 +24,7 @@ public class Level {
     
     public Level(String fileName) { 
         loadedFile = fileName;
-        loadFromFile(fileName);
+        loadFromFile(fileName);        
     }
     
     //Function loadFromFile loads the file into the level class. Returns false if it can't load, returns true if it can load
@@ -141,6 +143,70 @@ public class Level {
                         
                         tiles[i][line - 2] = new Tile(type, direction);
                     }
+                } else {
+                    String string = "";
+                    int i = 0;
+                    int storeys, x, y;
+                    
+                    //Get the width data up until the , seperator.
+                    for(i = 0; data.charAt(i) != ','; i++) {
+                        string = string + data.charAt(i);
+                    }
+                    
+                    //Convert that data into intergers 
+                    try {
+                        storeys = Integer.parseInt(string);
+                    }
+                    catch (NumberFormatException e) {
+                        return false;
+                    }
+
+
+                    string = ""; //Reset the string.
+                    i++; //Skip past the , seperator.
+                    
+                    //Get the width data up until the , seperator.
+                    for(i = 0; data.charAt(i) != ','; i++) {
+                        string = string + data.charAt(i);
+                    }  
+                    
+                    try {
+                        x = Integer.parseInt(string);
+                    }
+                    catch (NumberFormatException e) {
+                        return false;
+                    }
+                    
+                    string = ""; //Reset the string.
+                    i++; //Skip past the , seperator.
+                    
+                    //Get the width data up until the , seperator.
+                    for(i = 0; data.charAt(i) != ','; i++) {
+                        string = string + data.charAt(i);
+                    }
+                    
+                    try {
+                        y = Integer.parseInt(string);
+                    }
+                    catch (NumberFormatException e) {
+                        return false;
+                    }
+                    
+                    string = ""; //Reset the string.
+                    i++; //Skip past the , seperator.
+                    
+                    //Get the width data up until the , seperator.
+                    for(i = 0; data.charAt(i) != ','; i++) {
+                        string = string + data.charAt(i);
+                    }
+                    
+                    if(string == "RESIDENTIAL") {
+                        houses.add(new House(storeys, x, y, HouseType.RESIDENTIAL));
+                    } else if (string == "RESIDENTIAL") {
+                        houses.add(new House(storeys, x, y, HouseType.COMMERCIAL));
+                    } else {
+                        houses.add(new House(storeys, x, y, HouseType.BUSINESS));
+                    }
                 }
                 line++;
             }
@@ -200,6 +266,25 @@ public class Level {
                     }
                 }
                 data = data + "\n"; //Add the newline seperator.
+            }
+            
+            for(int i = 0; i < houses.size(); i++) {
+                data += Integer.toString(houses.get(i).storeys) + ",";
+                data += Integer.toString(houses.get(i).x) + ",";
+                data += Integer.toString(houses.get(i).x) + ",";
+                
+                switch(houses.get(i).type) {
+                    case RESIDENTIAL:
+                        data += "RESIDENTIAL,";
+                        break;
+                    case COMMERCIAL:
+                        data += "COMMERCIAL,";
+                        break;
+                    case BUSINESS:
+                        data += "BUSINESS";
+                        break;
+                }
+                data += "\n";
             }
             
             fileWriter.write(data);
