@@ -1,9 +1,9 @@
 #BlueJ class context
 comment0.target=Level
 comment1.params=fileName
-comment1.target=Level(java.lang.String)
+comment1.target=boolean\ loadFromFile(java.lang.String)
 comment2.params=fileName
-comment2.target=boolean\ loadFromFile(java.lang.String)
-comment3.params=fileName
-comment3.target=boolean\ saveToFile(java.lang.String)
+comment2.target=boolean\ saveToFile(java.lang.String)
+comment3.params=fileName\ levelName
+comment3.target=void\ newGame(java.lang.String,\ java.lang.String)
 numComments=4

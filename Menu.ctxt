@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=Menu
+comment1.params=savesFolder
+comment1.target=void\ getSaves(java.lang.String)
+numComments=2

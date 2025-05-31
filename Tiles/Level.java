@@ -18,14 +18,11 @@ public class Level {
     public int width;
     public int height;
     
+    public int maxLevelSize = 250;
+    
     String levelName;
     
     public String loadedFile = "";
-    
-    public Level(String fileName) { 
-        loadedFile = fileName;
-        loadFromFile(fileName);        
-    }
     
     //Function loadFromFile loads the file into the level class. Returns false if it can't load, returns true if it can load
     public boolean loadFromFile(String fileName) {
@@ -120,22 +117,22 @@ public class Level {
                         charNumber++; //Skip the comma.
                         
                         //Set the type to corresponding enumerated value.
-                        if(typeString.equals("GRASS")) { 
+                        if(typeString.equals("0")) { 
                             type = TileType.GRASS;
-                        } else if (typeString.equals("ROAD")) {
+                        } else if (typeString.equals("1")) {
                             type = TileType.ROAD;
-                        } else if (typeString.equals("CURVED_ROAD")) {
+                        } else if (typeString.equals("2")) {
                             type = TileType.CURVED_ROAD;
                         } else {
                             type = null;
                         }
                         
                         //Set the direction to corresponding enumerated value.
-                        if(directionString.equals("NORTH")) { 
+                        if(directionString.equals("0")) { 
                             direction = Direction.NORTH;
-                        } else if (directionString.equals("EAST")) {
+                        } else if (directionString.equals("1")) {
                             direction = Direction.EAST;
-                        } else if (directionString.equals("SOUTH")) {
+                        } else if (directionString.equals("2")) {
                             direction = Direction.SOUTH;
                         } else {
                             direction = Direction.WEST; //Why not set direction to west if it's unknown?
@@ -204,9 +201,9 @@ public class Level {
                         charNumber++;
                     }
                     
-                    if(string == "RESIDENTIAL") {
+                    if(string == "0") {
                         houses.add(new House(storeys, x, y, HouseType.RESIDENTIAL));
-                    } else if (string == "RESIDENTIAL") {
+                    } else if (string == "1") {
                         houses.add(new House(storeys, x, y, HouseType.COMMERCIAL));
                     } else {
                         houses.add(new House(storeys, x, y, HouseType.BUSINESS));
@@ -233,6 +230,7 @@ public class Level {
             File file = new File(fileName); //Load file.
             file.createNewFile(); //try creating a new file.
             FileWriter fileWriter = new FileWriter(file); //Create a new FileWriter to write to the file.
+            System.out.println(fileName);
             
             data = data + Integer.toString(this.width) + "x" +  Integer.toString(this.height) + "\n"; //Add the dimensions.
             data = data + this.levelName + "\n"; //Add the level name data.
@@ -241,13 +239,13 @@ public class Level {
                 for(int x = 0; x < this.height; x++) {
                     switch(this.tiles[x][y].type) { //Add the tile type.
                         case ROAD:
-                            data += "ROAD,";
+                            data += "1,";
                             break;
                         case CURVED_ROAD:
-                            data += "CURVED_ROAD,";
+                            data += "2,";
                             break;    
                         case GRASS:
-                            data += "GRASS,";
+                            data += "0,";
                             break;  
                         default:
                             System.out.println("Something has gone bad");
@@ -256,16 +254,16 @@ public class Level {
                     
                     switch(this.tiles[x][y].direction) { //Add the direction.
                         case NORTH:
-                            data += "NORTH,";
+                            data += "0,";
                             break;
                         case EAST:
-                            data += "EAST,";
+                            data += "1,";
                             break;    
                         case SOUTH:
-                            data += "SOUTH,";
+                            data += "2,";
                             break;  
                         default:
-                            data += "WEST,";
+                            data += "3,";
                             break;
                     }
                 }
@@ -279,13 +277,13 @@ public class Level {
                 
                 switch(houses.get(i).type) {
                     case RESIDENTIAL:
-                        data += "RESIDENTIAL,";
+                        data += "0,";
                         break;
                     case COMMERCIAL:
-                        data += "COMMERCIAL,";
+                        data += "1,";
                         break;
                     case BUSINESS:
-                        data += "BUSINESS,";
+                        data += "2,";
                         break;
                 }
                 data += "\n";
@@ -298,6 +296,28 @@ public class Level {
             return false;
         }
         
+        loadedFile = fileName;
         return true;
+    }
+    
+    public void newGame(String fileName, String levelName) {
+        width = 100;
+        height = 100;
+        
+        tiles = new Tile[width][height];
+        this.levelName = levelName;
+        
+        for(int y = 0; y < this.height; y++) { //Iterate tiles and add them to the save.
+            for(int x = 0; x < this.height; x++) {
+                try {
+                    tiles[x][y] = new Tile(TileType.GRASS, Direction.NORTH);
+                } catch (java.io.IOException ioe) {
+                    ioe.printStackTrace();
+                }  
+            }
+        }
+        
+        saveToFile(fileName);
+        loadedFile = fileName;
     }
 }

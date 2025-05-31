@@ -9,11 +9,11 @@
 
 import java.awt.*; 
 import java.awt.event.*; 
-import java.awt.geom.*; 
 import java.awt.image.*;
 import javax.swing.*; 
 import java.io.File;
 import javax.imageio.ImageIO;
+import java.util.ArrayList;
 
 import Tiles.*;
 
@@ -29,11 +29,16 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     final int screenWidth;
     final int screenHeight;
     
+    
     Game game; // Game game defines the game with type game.
     
     // Mouse coords, relative to the JPanel.
     double mouseX;
     double mouseY;
+    
+    ArrayList<KeyEvent> keys = new ArrayList<KeyEvent>();
+    final int newGameMaxLength = 16;
+    String newGame = "";
     
     // Mouse coords, relative to the tile system.
     double mouseTileX;
@@ -45,12 +50,13 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     
     TileSelect tileSelect = new TileSelect(); // The tile select menu.
     PauseMenu pauseMenu; // The pause menu.
+    MainMenu mainMenu;
     
     ImageButton exitImageButton; // The button for exiting menus.
     public BufferedImage exitIcon = null; 
     
-    public State state = State.GAME; // The game state as an enum.
-    
+    public State state = State.MAIN_MENU; // The game state as an enum.
+        
     final Color highlightColor = new Color(0, 0, 0, 50); // When you hover over a tile, this is the colour.
         
     public String savesFolder = "Saves/";
@@ -74,16 +80,19 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         screenWidth = width;
         screenHeight = height;
         
+        
         try { // Handel image loading errors.
-            exitImageButton = new ImageButton(0, 0, tileSelect.tileSize, tileSelect.tileSize, ImageIO.read(new File("Assets/exit.png"))); 
+            exitImageButton = new ImageButton(0, 0, tileSelect.tileSize, tileSelect.tileSize, ImageIO.read(new File("Assets/exit.png")));  
             pauseMenu = new PauseMenu(width, height);
+            mainMenu = new MainMenu(width, height);
             images = new Images(); 
         }
         catch (java.io.IOException ioe) {
+            System.out.println("whoops");
             ioe.printStackTrace();
         }
         
-        
+        mainMenu.getSaves(savesFolder); // load all the saves for the load screen.
     }
     
     public void startThread() {
@@ -95,14 +104,12 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     public void run() {
         double nextFrame = System.currentTimeMillis(); // What is the next frame to render on?
         double lastTime = System.currentTimeMillis(); // Used to calculate the delta.
-        double delta;
         int loops; 
        
         while (thread != null) {
             loops = 0;
             
             while(System.currentTimeMillis() > nextFrame && loops < maxFrameSkip) {
-                delta = System.currentTimeMillis() - lastTime; 
                 lastTime = System.currentTimeMillis();
 
                 nextFrame += frameSkip;
@@ -121,43 +128,21 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         
         Graphics2D g2 = (Graphics2D)g;
         
-        mouseX = getRelativePoint().getX();
-        mouseY = getRelativePoint().getY();
+        // Mouse x and y relative to the JPanel object (this).
+        mouseX = getRelativePoint().getX(); 
+        mouseY = getRelativePoint().getY(); 
+        // Mouse x and y relative to the coordinate system.
         mouseWorldX = (((mouseX + (game.camera.x * game.camera.zoom) - (screenWidth  / 2)) / game.camera.zoom));
         mouseWorldY = (((mouseY + (game.camera.y * game.camera.zoom) - (screenHeight / 2)) / game.camera.zoom));
+        // Mouse x and y relative to the tile system.
         mouseTileX = mouseWorldX / Tile.tileSize;         
         mouseTileY = mouseWorldY / Tile.tileSize;
         
+        
         switch(state) {
-            case TILE_SELECT: {
-                int x = 0;
-                for(TileType type : TileType.values()) { // Iterate the tile types;
-                    try {
-                        g2.drawImage(images.getImageFromType(type, Direction.NORTH), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null); //Draw the tiles.
-                    }
-                    catch (java.io.IOException ioe) {
-                        ioe.printStackTrace();
-                    }
-
-                    if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {  // If the mouse is hovering the tile.
-                        g2.setColor(highlightColor);
-                        g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
-                    
-                        if(mouseDown) { // If mouse clicked, set tile.
-                            tileSelect.selectedTile = type;
-                            state = State.GAME;
-                        }
-                    }
-                    x++;
-                }
-                exitImageButton.draw(g2);
-                            
-                if(mouseClicked && exitImageButton.isHovered((int) mouseY, (int) mouseX)) {
-                    state = State.GAME;
-                } 
-                break;
-            }
             case GAME: {
+                g2.setColor(Color.BLUE);
+                g2.fillRect(0, 0, screenWidth, screenHeight);
                 try {
                     for(int y = 0; y < game.level.height; y++) {
                         for(int x = 0; x < game.level.width; x++) {
@@ -173,31 +158,65 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                             (int) (y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
                                             (int) (Tile.tileSize     * game.camera.zoom) + 1, 
                                             (int) (Tile.tileSize     * game.camera.zoom) + 1);
-                                if(mouseDown) {
-                                try {
-                                        game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
-                                    } catch (java.io.IOException ioe) {
-                                        ioe.printStackTrace();
+                                if(tileSelect.open) {
+                                    if(mouseDown && !(Math.floor(mouseX / tileSelect.tileSize) > 0 && Math.floor(mouseX / tileSelect.tileSize) < TileType.values().length && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2)) {
+                                        try {
+                                            game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                        } catch (java.io.IOException ioe) {
+                                            ioe.printStackTrace();
                                         }
+                                    }
+                                } else {
+                                    if(mouseDown) {
+                                        try {
+                                            game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                        } catch (java.io.IOException ioe) {
+                                            ioe.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }
                     }   
                     g2.drawImage(images.getImageFromType(tileSelect.selectedTile, tileSelect.selectedDirection), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
+
+                    if(tileSelect.open) {
+                        int x = 0;
+                        for(TileType type : TileType.values()) { // Iterate the tile types;
+                            try {
+                                g2.drawImage(images.getImageFromType(type, Direction.NORTH), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null); //Draw the tiles.
+                            }
+                            catch (java.io.IOException ioe) {
+                                ioe.printStackTrace();
+                            }
+        
+                            if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {  // If the mouse is hovering the tile.
+                                g2.setColor(highlightColor);
+                                g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
+                            
+                                if(mouseClicked) { // If mouse clicked, set tile.
+                                    tileSelect.selectedTile = type;
+                                    tileSelect.open = false;
+                                }
+                            }
+                            x++;
+                        }
+                    }
                 } catch (java.io.IOException ioe) {
                     ioe.printStackTrace();
                 }
     
                 if(mouseClicked && mouseX > tileSelect.x && mouseX < tileSelect.x + tileSelect.closedWidth && mouseY > tileSelect.y && mouseY < tileSelect.y + tileSelect.closedHeight) {
-                    state = State.TILE_SELECT;
+                    tileSelect.open = true;
                 } 
                 break;
             }
             
             case PAUSE_MENU: {
+                System.out.println(game.level.loadedFile);
                 switch(pauseMenu.state) {
                     case MAIN:
-                        if(mouseDown) {
+                        if(mouseClicked) {
                             if(pauseMenu.loadGame.isHovered((int) mouseX, (int) mouseY)) {
                                 pauseMenu.state = PauseMenuState.LOAD_GAME;
                             } else if(pauseMenu.saveGame.isHovered((int) mouseX, (int) mouseY)) {
@@ -213,7 +232,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                         for(int i = 0; i < pauseMenu.saves.size(); i++) {
                             pauseMenu.saves.get(i).draw(g2);
                             
-                            if(mouseDown) {
+                            if(mouseClicked) {
                                 if(pauseMenu.saves.get(i).isHovered((int) mouseX, (int) mouseY)) {
                                     game.level.loadFromFile(savesFolder + pauseMenu.saves.get(i).text);
                                     state = State.GAME;
@@ -224,6 +243,60 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                     }
                 
                 break;
+            } case MAIN_MENU: {
+                switch(mainMenu.state) {
+                    case MAIN:
+                        if(mouseClicked) {
+                            if(mainMenu.loadGame.isHovered((int) mouseX, (int) mouseY) && mainMenu.saves.size() > 0) {
+                                mainMenu.state = MainMenuState.LOAD_GAME;
+                            } else if(mainMenu.newGame.isHovered((int) mouseX, (int) mouseY)) {
+                                mainMenu.state = MainMenuState.NEW_GAME;
+                            } 
+                        }
+                        
+                        if(mainMenu.saves.size() > 0) {
+                            mainMenu.loadGame.draw(g2);
+                        }
+                        mainMenu.newGame.draw(g2);
+                        g2.drawImage(mainMenu.logo, 500, 100, 600, 200, null);
+
+                        break;
+                    
+                    case LOAD_GAME: 
+                        for(int i = 0; i < mainMenu.saves.size(); i++) {
+                            mainMenu.saves.get(i).draw(g2);
+                            if(mouseClicked) {
+                                if(mainMenu.saves.get(i).isHovered((int) mouseX, (int) mouseY)) {
+                                    game.level.loadFromFile(savesFolder + mainMenu.saves.get(i).text);
+                                    state = State.GAME;
+                                }
+                            } 
+                        }
+                        break;
+                    case NEW_GAME:
+                        for(int i = 0; i < keys.size(); i++) {
+                            if(Character.isLetter(keys.get(i).getKeyChar()) && newGame.length() < newGameMaxLength) {
+                               newGame += keys.get(i).getKeyChar();
+                            } else if(keys.get(i).getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                                if(newGame.length() > 0) {
+                                    newGame = newGame.substring(0, newGame.length() - 1);
+                                }
+                            } else if(keys.get(i).getKeyCode() == KeyEvent.VK_ENTER && newGame.length() > 0) {
+                                game.level.newGame(savesFolder + newGame, newGame);
+                                this.state = State.GAME;
+                            } else if(keys.get(i).getKeyCode() == KeyEvent.VK_ESCAPE) {
+                                mainMenu.state = MainMenuState.MAIN;
+                            }
+                        }
+                        
+                        g2.setColor(Color.WHITE);
+                        g2.setFont(new Font("TimesRoman", Font.PLAIN, 100)); 
+                        g2.drawString(newGame, 10, 120);
+                        g2.drawString("Press Enter To Confirm", 10, 240);
+                        g2.drawString("Press Esc To Exit", 10, 340);
+                        keys = new ArrayList<KeyEvent>();
+                        break;
+                }
             }
         }
         
@@ -238,46 +311,48 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
     // When key pressed down set all the values to true.
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W:
-                game.keys.W = true;
-                break;
-            case KeyEvent.VK_A:
-                game.keys.A = true;
-                break;
-            case KeyEvent.VK_S:
-                game.keys.S = true;
-                break;
-            case KeyEvent.VK_D:
-                game.keys.D = true;
-                break;
-            case KeyEvent.VK_Q:
-                game.keys.UP = true;
-                break;
-            case KeyEvent.VK_E:
-                game.keys.DOWN = true;
-                break;
-            case KeyEvent.VK_UP:
-                tileSelect.selectedDirection = Direction.NORTH;
-                break;
-            case KeyEvent.VK_DOWN:
-                tileSelect.selectedDirection = Direction.SOUTH;
-                break;
-            case KeyEvent.VK_LEFT:
-                tileSelect.selectedDirection = Direction.WEST;
-                break;
-            case KeyEvent.VK_RIGHT:
-                tileSelect.selectedDirection = Direction.EAST;
-                break;
-            case KeyEvent.VK_ESCAPE:
-                pauseMenu.state = PauseMenuState.MAIN;
-                if(state == State.PAUSE_MENU) {
-                    state = State.GAME;
-                } else {
-                    pauseMenu.getSaves(savesFolder);
-                    state = State.PAUSE_MENU;
-                }
-                break;
+ 
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_W:
+                        game.keys.W = true;
+                        break;
+                    case KeyEvent.VK_A:
+                        game.keys.A = true;
+                        break;
+                    case KeyEvent.VK_S:
+                        game.keys.S = true;
+                        break;
+                    case KeyEvent.VK_D:
+                        game.keys.D = true;
+                        break;
+                    case KeyEvent.VK_Q:
+                        game.keys.UP = true;
+                        break;
+                    case KeyEvent.VK_E:
+                        game.keys.DOWN = true;
+                        break;
+                    case KeyEvent.VK_UP:
+                        tileSelect.selectedDirection = Direction.NORTH;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        tileSelect.selectedDirection = Direction.SOUTH;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        tileSelect.selectedDirection = Direction.WEST;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        tileSelect.selectedDirection = Direction.EAST;
+                        break;
+                    case KeyEvent.VK_ESCAPE:
+                        pauseMenu.state = PauseMenuState.MAIN;
+                        if(state == State.PAUSE_MENU) {
+                            state = State.GAME;
+                        } else if(state == State.GAME)  {
+                            pauseMenu.getSaves(savesFolder);
+                            state = State.PAUSE_MENU;
+                        }
+                        break;
+            
         }
     }
         
@@ -303,6 +378,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                 game.keys.DOWN = false;
                 break;
         }
+        keys.add(e);
     }
     
     public void mouseWheelMoved(MouseWheelEvent e) {

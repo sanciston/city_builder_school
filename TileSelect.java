@@ -22,6 +22,8 @@ public class TileSelect {
     public final int closedWidth = 100;
     public final int closedHeight = 100;
     
+    public boolean open = false;
+    
     public int openTileWidth = 5;
     
     public int openWidth = openTileWidth * Tile.tileSize;

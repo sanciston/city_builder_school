@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=MainMenu
+comment1.params=screenWidth\ screenHeight
+comment1.target=MainMenu(int,\ int)
+numComments=2

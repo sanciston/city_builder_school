@@ -19,7 +19,7 @@ public class Game  {
     final int speed = 3;
     
     public Game() {
-        level = new Level("level.txt");
+        level = new Level();
         
         camera = new Camera(1, 0, 0);
         
