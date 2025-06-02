@@ -142,6 +142,7 @@ public class Level {
                     }
                 } else {
                     String string = "";
+                    HouseType type;
                     int charNumber = 0;
                     int storeys, x, y;
                     
@@ -201,12 +202,31 @@ public class Level {
                         charNumber++;
                     }
                     
-                    if(string == "0") {
-                        houses.add(new House(storeys, x, y, HouseType.RESIDENTIAL));
-                    } else if (string == "1") {
-                        houses.add(new House(storeys, x, y, HouseType.COMMERCIAL));
+                    if(string.equals("0")) {
+                        type = HouseType.RESIDENTIAL;
+                    } else if (string.equals("1")) {
+                        type = HouseType.COMMERCIAL;
                     } else {
-                        houses.add(new House(storeys, x, y, HouseType.BUSINESS));
+                        type = HouseType.BUSINESS;
+                    }
+                    
+                    string = ""; //Reset the string.
+                    charNumber++; //Skip past the , seperator.
+                    
+                    //Get the type data up until the , seperator.
+                    while(data.charAt(charNumber) != ',') {
+                        string = string + data.charAt(charNumber);
+                        charNumber++;
+                    }
+                    
+                    if(string.equals("0")) {
+                        houses.add(new House(storeys, x, y, type, Direction.NORTH));
+                    } else if (string.equals("1")) {
+                        houses.add(new House(storeys, x, y, type, Direction.EAST));
+                    } else if (string.equals("2")) {
+                        houses.add(new House(storeys, x, y, type, Direction.SOUTH));
+                    } else {
+                        houses.add(new House(storeys, x, y, type, Direction.WEST));
                     }
                 }
                 line++;
@@ -285,6 +305,20 @@ public class Level {
                     case BUSINESS:
                         data += "2,";
                         break;
+                }
+                switch(houses.get(i).direction) { //Add the direction.
+                        case NORTH:
+                            data += "0,";
+                            break;
+                        case EAST:
+                            data += "1,";
+                            break;    
+                        case SOUTH:
+                            data += "2,";
+                            break;  
+                        default:
+                            data += "3,";
+                            break;
                 }
                 data += "\n";
             }

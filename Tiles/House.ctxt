@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=House
 comment0.text=\n\ The\ house\ class,\ for\ houses.\ \n\n\ AUTHOR\:\ Brendan\ Laking\n\ VERSION\:\ 2025.05.27\n
-comment1.params=storeys\ x\ y\ type
-comment1.target=House(int,\ int,\ int,\ HouseType)
+comment1.params=storeys\ x\ y\ type\ direction
+comment1.target=House(int,\ int,\ int,\ HouseType,\ Direction)
 numComments=2

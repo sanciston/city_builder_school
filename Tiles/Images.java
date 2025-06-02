@@ -20,6 +20,11 @@ public class Images {
     final BufferedImage curvedRoadEast;
     final BufferedImage curvedRoadNorth;
     final BufferedImage curvedRoadSouth;
+    
+    final BufferedImage houseNorth;
+    final BufferedImage houseEast;
+    final BufferedImage houseSouth;
+    final BufferedImage houseWest;
 
     final BufferedImage grass;
 
@@ -34,7 +39,12 @@ public class Images {
         curvedRoadNorth = ImageIO.read(new File("Assets/curved_road_north.png"));
         curvedRoadSouth = ImageIO.read(new File("Assets/curved_road_south.png"));
         
-        grass = ImageIO.read(new File("Assets/grass.png"));        
+        houseNorth = ImageIO.read(new File("Assets/house_north.png"));
+        houseEast  = ImageIO.read(new File("Assets/house_east.png"));
+        houseSouth = ImageIO.read(new File("Assets/house_south.png"));
+        houseWest  = ImageIO.read(new File("Assets/house_west.png"));
+        
+        grass = ImageIO.read(new File("Assets/grass.png"));  
     }
     
     public BufferedImage getImageFromType(TileType type, Direction direction) throws java.io.IOException {
@@ -64,4 +74,20 @@ public class Images {
                 return grass;
         }
     }
+    
+    public BufferedImage getHouseImage( HouseType type,Direction direction) throws java.io.IOException {
+        switch(direction) {
+            case NORTH:
+                return houseNorth;
+            case SOUTH:      
+                return houseSouth;
+            case EAST:
+                return houseEast;
+            case WEST: 
+                return houseWest;
+        }
+        
+        return houseNorth;
+    }
 }
+

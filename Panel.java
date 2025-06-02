@@ -159,23 +159,46 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                             (int) (Tile.tileSize     * game.camera.zoom) + 1, 
                                             (int) (Tile.tileSize     * game.camera.zoom) + 1);
                                 if(tileSelect.open) {
-                                    if(mouseDown && !(Math.floor(mouseX / tileSelect.tileSize) > 0 && Math.floor(mouseX / tileSelect.tileSize) < TileType.values().length && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2)) {
+                                    if(mouseDown && !(Math.floor(mouseX / tileSelect.tileSize) > 0 && Math.floor(mouseX / tileSelect.tileSize) < TileType.values().length + 1 && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2)) {
                                         try {
-                                            game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                            if(!tileSelect.houseSelected) {
+                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                            }                                      
                                         } catch (java.io.IOException ioe) {
                                             ioe.printStackTrace();
                                         }
+                                    }
+                                    if(mouseClicked) {
+                                        if(tileSelect.houseSelected) {
+                                            placeHouse(x, y);
+                                        } 
                                     }
                                 } else {
                                     if(mouseDown) {
                                         try {
-                                            game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                            if(!tileSelect.houseSelected) {
+                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                            }                                      
                                         } catch (java.io.IOException ioe) {
                                             ioe.printStackTrace();
                                         }
                                     }
+                                    if(mouseClicked) {
+                                        if(tileSelect.houseSelected) {
+                                            placeHouse(x, y);
+                                        } 
+                                    }
                                 }
                             }
+                        }
+                        
+                        for(int i = 0; i < game.level.houses.size(); i++) {
+                            House house = game.level.houses.get(i);
+                            g2.drawImage(images.getHouseImage(house.type, house.direction),
+                                (int) (house.x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                                (int) (house.y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
+                                (int) (Tile.tileSize           * game.camera.zoom) + 1, 
+                                (int) (Tile.tileSize           * game.camera.zoom) + 1, null);
                         }
                     }   
                     g2.drawImage(images.getImageFromType(tileSelect.selectedTile, tileSelect.selectedDirection), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
@@ -197,9 +220,41 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                 if(mouseClicked) { // If mouse clicked, set tile.
                                     tileSelect.selectedTile = type;
                                     tileSelect.open = false;
+                                    tileSelect.houseSelected = false;
                                 }
                             }
                             x++;
+                        }
+                        
+                        for(HouseType type : HouseType.values()) { // Iterate the tile types;
+                            try {
+                                g2.drawImage(images.getHouseImage(type, Direction.NORTH), x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize, null); //Draw the tiles.
+                            }
+                            catch (java.io.IOException ioe) {
+                                ioe.printStackTrace();
+                            }
+        
+                            if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {  // If the mouse is hovering the tile.
+                                g2.setColor(highlightColor);
+                                g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
+                            
+                                if(mouseClicked) { // If mouse clicked, set tile.
+                                    tileSelect.selectedHouse = type;
+                                    tileSelect.open = false;
+                                    tileSelect.houseSelected = true;
+                                }
+                            }
+                            x++;
+                        }
+                        
+                        if(Math.floor(mouseX / tileSelect.tileSize) == x && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2) {  // If the mouse is hovering the tile.
+                            g2.setColor(highlightColor);
+                            g2.fillRect(x * tileSelect.tileSize, tileSelect.closedHeight, tileSelect.tileSize, tileSelect.tileSize);
+                        
+                            if(mouseClicked) { // If mouse clicked, set tile.
+                                tileSelect.houseSelected = true;
+                                tileSelect.open = false;                                
+                            }
                         }
                     }
                 } catch (java.io.IOException ioe) {
@@ -418,6 +473,18 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         return point;
     }
     
-    
+    public void placeHouse(int x, int y) {
+        boolean housePlaceable = true;
+        
+        for(int i = 0; i < game.level.houses.size(); i++) {
+            if(game.level.houses.get(i).x == x && game.level.houses.get(i).y == y) {
+                housePlaceable = false;
+            }
+        }
+        
+        if(housePlaceable) {
+            game.level.houses.add(new House(1, x, y, HouseType.RESIDENTIAL, Direction.NORTH));
+        }
+    }
 }
 

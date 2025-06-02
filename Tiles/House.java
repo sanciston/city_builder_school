@@ -8,13 +8,15 @@ package Tiles;
 public class House {
     public int storeys;
     public HouseType type;
+    public Direction direction;
     
     public int x, y;
     
-    public House(int storeys, int x, int y, HouseType type) {
+    public House(int storeys, int x, int y, HouseType type, Direction direction) {
         this.storeys = storeys; 
         this.x = x;
         this.y = y;
         this.type = type;
+        this.direction = direction;
     }
 }

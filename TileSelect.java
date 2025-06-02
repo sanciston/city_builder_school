@@ -15,6 +15,7 @@ import java.io.File;
 public class TileSelect {
     public TileType selectedTile = TileType.GRASS; 
     public Direction selectedDirection = Direction.NORTH;
+    public HouseType selectedHouse = HouseType.RESIDENTIAL;
     
     public final int x = 0;
     public final int y = 0;
@@ -23,6 +24,7 @@ public class TileSelect {
     public final int closedHeight = 100;
     
     public boolean open = false;
+    public boolean houseSelected = false;
     
     public int openTileWidth = 5;
     

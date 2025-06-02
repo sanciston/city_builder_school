@@ -4,4 +4,6 @@ comment1.params=
 comment1.target=Images()
 comment2.params=type\ direction
 comment2.target=java.awt.image.BufferedImage\ getImageFromType(TileType,\ Direction)
-numComments=3
+comment3.params=type\ direction
+comment3.target=java.awt.image.BufferedImage\ getHouseImage(HouseType,\ Direction)
+numComments=4
