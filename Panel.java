@@ -474,7 +474,33 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     }
     
     public void placeHouse(int x, int y) {
-        boolean housePlaceable = true;
+        boolean housePlaceable = false;
+        Direction houseDirection = Direction.NORTH;
+
+        if(y - 1 > 0) { //CHECK TOP        
+            if(game.level.tiles[x][y - 1].type == TileType.ROAD) {
+                houseDirection = Direction.SOUTH;
+                housePlaceable = true;
+            }
+        } 
+        if(y + 1 > 0) { //CHECK BOTTOM        
+            if(game.level.tiles[x][y + 1].type == TileType.ROAD) {
+                houseDirection = Direction.NORTH;
+                housePlaceable = true;
+            }
+        } 
+        if(x - 1 > 0) { //CHECK LEFT
+            if(game.level.tiles[x - 1][y].type == TileType.ROAD) {
+                houseDirection = Direction.EAST;
+                housePlaceable = true;
+            }
+        }
+        if(x + 1 > 0) { //CHECK RIGHT
+            if(game.level.tiles[x + 1][y].type == TileType.ROAD) {
+                houseDirection = Direction.WEST;
+                housePlaceable = true;
+            }
+        }
         
         for(int i = 0; i < game.level.houses.size(); i++) {
             if(game.level.houses.get(i).x == x && game.level.houses.get(i).y == y) {
@@ -482,8 +508,12 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             }
         }
         
+        if(game.level.tiles[x][y].type != TileType.GRASS) {
+            housePlaceable = false;
+        }
+        
         if(housePlaceable) {
-            game.level.houses.add(new House(1, x, y, HouseType.RESIDENTIAL, Direction.NORTH));
+            game.level.houses.add(new House(1, x, y, HouseType.RESIDENTIAL, houseDirection));
         }
     }
 }
