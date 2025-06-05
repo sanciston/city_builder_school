@@ -479,25 +479,25 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
         if(y - 1 > 0) { //CHECK TOP        
             if(game.level.tiles[x][y - 1].type == TileType.ROAD) {
-                houseDirection = Direction.SOUTH;
+                houseDirection = Direction.NORTH;
                 housePlaceable = true;
             }
         } 
         if(y + 1 > 0) { //CHECK BOTTOM        
             if(game.level.tiles[x][y + 1].type == TileType.ROAD) {
-                houseDirection = Direction.NORTH;
+                houseDirection = Direction.SOUTH;
                 housePlaceable = true;
             }
         } 
         if(x - 1 > 0) { //CHECK LEFT
             if(game.level.tiles[x - 1][y].type == TileType.ROAD) {
-                houseDirection = Direction.EAST;
+                houseDirection = Direction.WEST;
                 housePlaceable = true;
             }
         }
         if(x + 1 > 0) { //CHECK RIGHT
             if(game.level.tiles[x + 1][y].type == TileType.ROAD) {
-                houseDirection = Direction.WEST;
+                houseDirection = Direction.EAST;
                 housePlaceable = true;
             }
         }
