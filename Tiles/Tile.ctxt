@@ -1,5 +1,5 @@
 #BlueJ class context
 comment0.target=Tile
-comment1.params=type\ direction
-comment1.target=Tile(TileType,\ Direction)
+comment1.params=type\ direction\ x\ y
+comment1.target=Tile(TileType,\ Direction,\ int,\ int)
 numComments=2

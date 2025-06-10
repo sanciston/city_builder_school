@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=Node
+comment1.params=x\ y\ solid
+comment1.target=Node(int,\ int,\ boolean)
+comment2.params=
+comment2.target=void\ setSolid()
+comment3.params=
+comment3.target=void\ setNotSolid()
+comment4.params=
+comment4.target=void\ setGoal()
+comment5.params=
+comment5.target=void\ setStart()
+comment6.params=
+comment6.target=void\ reset()
+numComments=7

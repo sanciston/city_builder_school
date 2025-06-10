@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Car
+comment1.params=x\ y
+comment1.target=Car(int,\ int)
+comment2.params=
+comment2.target=void\ setStartNode()
+comment3.params=x\ y
+comment3.target=void\ setGoalNode(int,\ int)
+comment4.params=tiles
+comment4.target=void\ generateNodes(Tiles.Tile[][])
+numComments=5

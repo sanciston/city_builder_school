@@ -3,7 +3,7 @@
  * JPanel for rendering and drawing
  * 
  * AUTHOR: Brendan Laking
- * VERSION: 2025.05.27
+ * VERSION: 2025.06.09
  */
 
 
@@ -45,8 +45,11 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     double mouseTileY;
     double mouseWorldX;
     double mouseWorldY;
+    double lastMouseTileX;
+    double lastMouseTileY;
     boolean mouseDown;
     boolean mouseClicked;
+
     
     TileSelect tileSelect = new TileSelect(); // The tile select menu.
     PauseMenu pauseMenu; // The pause menu.
@@ -60,7 +63,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     final Color highlightColor = new Color(0, 0, 0, 50); // When you hover over a tile, this is the colour.
         
     public String savesFolder = "Saves/";
-    
+        
     Images images; // Pre load all the images.
         
     public Panel(int width, int height) {
@@ -127,7 +130,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         super.paintComponent(g);
         
         Graphics2D g2 = (Graphics2D)g;
-        
+        lastMouseTileX = mouseTileX;
+        lastMouseTileY = mouseTileY;
         // Mouse x and y relative to the JPanel object (this).
         mouseX = getRelativePoint().getX(); 
         mouseY = getRelativePoint().getY(); 
@@ -138,6 +142,20 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
         mouseTileX = mouseWorldX / Tile.tileSize;         
         mouseTileY = mouseWorldY / Tile.tileSize;
         
+        
+        if(tileSelect.selectedTile == TileType.ROAD) {
+            if(mouseTileX > lastMouseTileX && mouseTileY == lastMouseTileY) {
+                tileSelect.selectedDirection = Direction.EAST;
+            } else if(mouseTileX == lastMouseTileX && mouseTileY > lastMouseTileY) {
+                tileSelect.selectedDirection = Direction.SOUTH;
+            
+            } else if(mouseTileX == lastMouseTileX && mouseTileY < lastMouseTileY) {
+                tileSelect.selectedDirection = Direction.NORTH;
+            
+            } else if(mouseTileX < lastMouseTileX && mouseTileY == lastMouseTileY) {
+                tileSelect.selectedDirection = Direction.WEST;
+            } 
+        } 
         
         switch(state) {
             case GAME: {
@@ -162,7 +180,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                     if(mouseDown && !(Math.floor(mouseX / tileSelect.tileSize) > 0 && Math.floor(mouseX / tileSelect.tileSize) < TileType.values().length + 1 && mouseY > tileSelect.tileSize && mouseY < tileSelect.tileSize * 2)) {
                                         try {
                                             if(!tileSelect.houseSelected) {
-                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection, x, y);
                                             }                                      
                                         } catch (java.io.IOException ioe) {
                                             ioe.printStackTrace();
@@ -177,7 +195,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                     if(mouseDown) {
                                         try {
                                             if(!tileSelect.houseSelected) {
-                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection);
+                                                game.level.tiles[x][y] = new Tile(tileSelect.selectedTile, tileSelect.selectedDirection, x, y);
                                             }                                      
                                         } catch (java.io.IOException ioe) {
                                             ioe.printStackTrace();
@@ -200,7 +218,13 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                                 (int) (Tile.tileSize           * game.camera.zoom) + 1, 
                                 (int) (Tile.tileSize           * game.camera.zoom) + 1, null);
                         }
-                    }   
+                    } 
+                    g2.setColor(Color.BLUE);
+                    /*g2.fillRect((int) (car.x * Tile.tileSize * game.camera.zoom) - (int) (game.camera.x * game.camera.zoom) + (screenWidth  / 2), 
+                                (int) (car.y * Tile.tileSize * game.camera.zoom) - (int) (game.camera.y * game.camera.zoom) + (screenHeight  / 2),
+                                (int) (Tile.tileSize         * game.camera.zoom) + 1, 
+                                (int) (Tile.tileSize         * game.camera.zoom) + 1);
+                    */
                     g2.drawImage(images.getImageFromType(tileSelect.selectedTile, tileSelect.selectedDirection), tileSelect.x, tileSelect.y, tileSelect.closedWidth, tileSelect.closedHeight, null);
 
                     if(tileSelect.open) {
@@ -366,7 +390,6 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
     // When key pressed down set all the values to true.
     public void keyPressed(KeyEvent e) {
- 
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_W:
                         game.keys.W = true;
@@ -407,7 +430,6 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
                             state = State.PAUSE_MENU;
                         }
                         break;
-            
         }
     }
         

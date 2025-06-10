@@ -3,11 +3,11 @@
  * Basic camera type
  *
  * AUTHOR: Brendan Laking
- * VERSION: 2025.05.18
+ * VERSION: 2025.06.09
  */
 public class Camera {
     public double zoom;
-    public final double maxZoom = 10;
+    public final double maxZoom = 6;
     public final double minZoom = 0.1;
     
     public int x;

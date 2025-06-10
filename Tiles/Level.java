@@ -138,7 +138,7 @@ public class Level {
                             direction = Direction.WEST; //Why not set direction to west if it's unknown?
                         }
                         
-                        tiles[i][line - 2] = new Tile(type, direction);
+                        tiles[i][line - 2] = new Tile(type, direction, i, line - 2);
                     }
                 } else {
                     String string = "";
@@ -344,7 +344,7 @@ public class Level {
         for(int y = 0; y < this.height; y++) { //Iterate tiles and add them to the save.
             for(int x = 0; x < this.height; x++) {
                 try {
-                    tiles[x][y] = new Tile(TileType.GRASS, Direction.NORTH);
+                    tiles[x][y] = new Tile(TileType.GRASS, Direction.NORTH, x, y);
                 } catch (java.io.IOException ioe) {
                     ioe.printStackTrace();
                 }  
